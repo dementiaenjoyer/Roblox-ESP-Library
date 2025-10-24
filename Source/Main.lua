@@ -205,4 +205,5 @@ do
     end
 
     -- Library:Initiate();
+    return Library;
 end
