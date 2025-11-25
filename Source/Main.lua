@@ -56,9 +56,9 @@ end
 -- Main
 do
     local SettingsTemplate = {
-        ["Box"] = { ["Enabled"] = true, ["Colors"] = { White, Black }},
-        ["Name"] = { ["Enabled"] = true, ["Colors"] = { White, Black }},
-        ["Healthbar"] = { ["Enabled"] = true, ["Colors"] = { White, Black }}
+        ["Box"] = { ["Enabled"] = false, ["Colors"] = { White, Black }},
+        ["Name"] = { ["Enabled"] = false, ["Colors"] = { White, Black }},
+        ["Healthbar"] = { ["Enabled"] = false, ["Colors"] = { White, Black }}
     };
 
     local Library = { Connections = { }, Settings = SettingsTemplate }; do
