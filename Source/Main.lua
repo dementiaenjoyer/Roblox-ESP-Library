@@ -249,15 +249,7 @@ do
                 Library:Update(DeltaTime);
             end)
         end
-
-        --[[
-        function Library:Destroy(): nil
-            for _, Connection in self.Connections do
-                Connection:Disconnect();
-            end
-        end
-        ]]
-
+        
         function Library:SetPlayerObject(Index, Value): nil
             PlayerManager.PlayerObject = Value;
         end
