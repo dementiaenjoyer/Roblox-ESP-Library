@@ -24,8 +24,6 @@ local GetChildren = game.GetChildren;
 local GetPlayers = Players.GetPlayers;
 
 local Color3New = Color3.new;
-local Color3FromRGB = Color3.fromRGB;
-
 local DrawingNew = Drawing.new;
 
 local Vector3New, Vector2New, Vector3Zero, Vector2Zero = Vector3.new, Vector2.new, Vector3.zero, Vector2.zero;
@@ -98,7 +96,6 @@ do
                     ["Thickness"] = 3;
                     ["Size"] = Size;
                     ["Position"] = Position;
-                    ["ZIndex"] = 0;
                 });
 
                 Utility:Drawing("Square", {
@@ -108,50 +105,42 @@ do
                     ["Thickness"] = 1;
                     ["Size"] = Size;
                     ["Position"] = Position;
-                    ["ZIndex"] = 1;
                 });
             end)
 
-            Components:Set("Corner", function(Self, Options) -- forgive me for this code
+            Components:Set("Corner", function(Self, Options)
                 local Position, Size = Self:GetRender();
-
+                                
                 if (not Position) then
                     return;
                 end
             
                 local Colors = Options.Colors;
                 local Color, OutlineColor = Colors[1], Colors[2];
-
+            
                 Position = Vector2New(Round(Position.X), Round(Position.Y));
                 Size = Vector2New(Round(Size.X), Round(Size.Y));
             
                 local PositionX, PositionY = Position.X, Position.Y;
                 local SizeX, SizeY = Size.X, Size.Y;
             
+                local RightX = PositionX + SizeX - 1;
+                local BottomY = PositionY + SizeY - 1;
+            
                 local Width = Round(SizeX * 0.2);
                 local Height = Round(SizeY * 0.2);
-
+            
                 local PositionScale = PositionX + Width;
                 local HeightScale = PositionY + Height;
-
+            
                 local From = Vector2New(PositionX, PositionY);
-                        
+            
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = OutlineColor;
                     ["Thickness"] = 3;
                     ["From"] = Vector2New(PositionX - 1, PositionY);
                     ["To"] = Vector2New(PositionScale + 2, PositionY);
-                    ["ZIndex"] = 0;
-                });
-            
-                Utility:Drawing("Line", {
-                    ["Visible"] = true;
-                    ["Color"] = Color;
-                    ["Thickness"] = 1;
-                    ["From"] = From;
-                    ["To"] = Vector2New(PositionScale + 1, PositionY);
-                    ["ZIndex"] = 1;
                 });
             
                 Utility:Drawing("Line", {
@@ -160,7 +149,22 @@ do
                     ["Thickness"] = 3;
                     ["From"] = Vector2New(PositionX, PositionY - 1);
                     ["To"] = Vector2New(PositionX, HeightScale + 2);
-                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = From;
+                    ["To"] = Vector2New(PositionScale + 1, PositionY);
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(RightX + 1, PositionY);
+                    ["To"] = Vector2New(RightX - Width - 1, PositionY);
                 });
             
                 Utility:Drawing("Line", {
@@ -169,117 +173,96 @@ do
                     ["Thickness"] = 1;
                     ["From"] = From;
                     ["To"] = Vector2New(PositionX, HeightScale + 1);
-                    ["ZIndex"] = 1;
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = OutlineColor;
                     ["Thickness"] = 3;
-                    ["From"] = Vector2New(PositionX + SizeX + 1, PositionY);
-                    ["To"] = Vector2New(PositionX + SizeX - Width - 2, PositionY);
-                    ["ZIndex"] = 0;
+                    ["From"] = Vector2New(RightX, PositionY - 1);
+                    ["To"] = Vector2New(RightX, HeightScale + 2);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = Color;
                     ["Thickness"] = 1;
-                    ["From"] = Vector2New(PositionX + SizeX, PositionY);
-                    ["To"] = Vector2New(PositionX + SizeX - Width - 1, PositionY);
-                    ["ZIndex"] = 1;
+                    ["From"] = Vector2New(RightX, PositionY);
+                    ["To"] = Vector2New(RightX - Width, PositionY);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = OutlineColor;
                     ["Thickness"] = 3;
-                    ["From"] = Vector2New(PositionX + SizeX, PositionY - 1);
-                    ["To"] = Vector2New(PositionX + SizeX, HeightScale + 2);
-                    ["ZIndex"] = 0;
+                    ["From"] = Vector2New(PositionX - 1, BottomY);
+                    ["To"] = Vector2New(PositionScale + 2, BottomY);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = Color;
                     ["Thickness"] = 1;
-                    ["From"] = Vector2New(PositionX + SizeX, PositionY);
-                    ["To"] = Vector2New(PositionX + SizeX, HeightScale + 1);
-                    ["ZIndex"] = 1;
+                    ["From"] = Vector2New(RightX, PositionY);
+                    ["To"] = Vector2New(RightX, HeightScale + 1);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = OutlineColor;
                     ["Thickness"] = 3;
-                    ["From"] = Vector2New(PositionX - 1, PositionY + SizeY - 1);
-                    ["To"] = Vector2New(PositionScale + 2, PositionY + SizeY - 1);
-                    ["ZIndex"] = 0;
+                    ["From"] = Vector2New(PositionX, BottomY + 1);
+                    ["To"] = Vector2New(PositionX, BottomY - Height - 1);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = Color;
                     ["Thickness"] = 1;
-                    ["From"] = Vector2New(PositionX, PositionY + SizeY - 1);
-                    ["To"] = Vector2New(PositionScale + 1, PositionY + SizeY - 1);
-                    ["ZIndex"] = 1;
+                    ["From"] = Vector2New(PositionX, BottomY);
+                    ["To"] = Vector2New(PositionScale + 1, BottomY);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = OutlineColor;
                     ["Thickness"] = 3;
-                    ["From"] = Vector2New(PositionX, PositionY + SizeY + 1);
-                    ["To"] = Vector2New(PositionX, PositionY + SizeY - Height - 1);
-                    ["ZIndex"] = 0;
+                    ["From"] = Vector2New(RightX + 1, BottomY);
+                    ["To"] = Vector2New(RightX - Width - 1, BottomY);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = Color;
                     ["Thickness"] = 1;
-                    ["From"] = Vector2New(PositionX, PositionY + SizeY);
-                    ["To"] = Vector2New(PositionX, PositionY + SizeY - Height);
-                    ["ZIndex"] = 1;
+                    ["From"] = Vector2New(PositionX, BottomY);
+                    ["To"] = Vector2New(PositionX, BottomY - Height);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = OutlineColor;
                     ["Thickness"] = 3;
-                    ["From"] = Vector2New(PositionX + SizeX + 1, PositionY + SizeY - 1);
-                    ["To"] = Vector2New(PositionX + SizeX - Width - 2, PositionY + SizeY - 1);
-                    ["ZIndex"] = 0;
+                    ["From"] = Vector2New(RightX, BottomY + 2);
+                    ["To"] = Vector2New(RightX, BottomY - Height);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = Color;
                     ["Thickness"] = 1;
-                    ["From"] = Vector2New(PositionX + SizeX, PositionY + SizeY - 1);
-                    ["To"] = Vector2New(PositionX + SizeX - Width - 1, PositionY + SizeY - 1);
-                    ["ZIndex"] = 1;
-                });
-            
-                Utility:Drawing("Line", {
-                    ["Visible"] = true;
-                    ["Color"] = OutlineColor;
-                    ["Thickness"] = 3;
-                    ["From"] = Vector2New(PositionX + SizeX, PositionY + SizeY + 1);
-                    ["To"] = Vector2New(PositionX + SizeX, PositionY + SizeY - Height - 1);
-                    ["ZIndex"] = 0;
+                    ["From"] = Vector2New(RightX, BottomY + 1);
+                    ["To"] = Vector2New(RightX, BottomY - Height + 1);
                 });
             
                 Utility:Drawing("Line", {
                     ["Visible"] = true;
                     ["Color"] = Color;
                     ["Thickness"] = 1;
-                    ["From"] = Vector2New(PositionX + SizeX, PositionY + SizeY);
-                    ["To"] = Vector2New(PositionX + SizeX, PositionY + SizeY - Height);
-                    ["ZIndex"] = 1;
+                    ["From"] = Vector2New(RightX, BottomY);
+                    ["To"] = Vector2New(RightX - Width, BottomY);
                 });
-            end);
+            end)
 
             Components:Set("Name", function(Self, Options)
                 local Position, Size = Self:GetRender();
@@ -307,7 +290,6 @@ do
                     ["Center"] = true;
                     ["Text"] = Name;
                     ["Position"] = Vector2New(Position.X + (Size.X * 0.5), Position.Y - 15);
-                    ["ZIndex"] = 2;
                 });
             end)
 
@@ -328,8 +310,6 @@ do
 
                 local Top, Bottom = Floor(PositionY + 0.5), Floor(PositionY + Size.Y + 0.5);
                 local Health, MaxHealth = Self:GetHealth(Character);
-                local HealthRatio = Max(0, Min(1, Health / MaxHealth));
-                local HealthHeight = Bottom - Floor(HealthRatio * (Bottom - Top) + 0.5);
 
                 Utility:Drawing("Line", {
                     ["Visible"] = true,
@@ -337,7 +317,6 @@ do
                     ["Thickness"] = 3,
                     ["From"] = Vector2New(PositionX, Bottom + 1),
                     ["To"] = Vector2New(PositionX, Top - 1),
-                    ["ZIndex"] = 0,
                 });
 
                 Utility:Drawing("Line", {
@@ -345,8 +324,7 @@ do
                     ["Color"] = Color,
                     ["Thickness"] = 1,
                     ["From"] = Vector2New(PositionX, Bottom),
-                    ["To"] = Vector2New(PositionX, HealthHeight),
-                    ["ZIndex"] = 1,
+                    ["To"] = Vector2New(PositionX, Bottom - Floor(Max(0, Min(1, Health / MaxHealth)) * (Bottom - Top) + 0.5)),
                 });
             end)
         end
