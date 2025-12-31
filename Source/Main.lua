@@ -38,11 +38,11 @@ local Black, White = Color3New(0, 0, 0), Color3New(1, 1, 1);
 
 -- Functions
 local Utility = { }; do
-    function Utility:ReverseKeys(Old, Hello)
+    function Utility:ReverseKeys(Keys, MakeString)
         local Table = { };
 
-        for Index, Value in Old do
-            if (typeof(Index) == "number") and Hello then
+        for Index, Value in Keys do
+            if (typeof(Index) == "number") and MakeString then
                 Value, Index = Value.Name, Value;
             end
 
@@ -51,23 +51,34 @@ local Utility = { }; do
 
         return Table;
     end
+
+    function Utility:Drawing(Class, Properties)
+        local DrawingObject = DrawingNew(Class, DrawingFlag);
+
+        for Index, Property in Properties do
+            DrawingObject[Index] = Property;
+        end
+
+        return DrawingObject;
+    end
 end
 
 -- Main
 do
     local SettingsTemplate = {
-        ["Box"] = { ["Enabled"] = false, ["Colors"] = { White, Black }},
+        ["Healthbar"] = { ["Enabled"] = false, ["Colors"] = { White, Black }},
+        ["Corner"] = { ["Enabled"] = false, ["Colors"] = { White, Black }},
         ["Name"] = { ["Enabled"] = false, ["Colors"] = { White, Black }},
-        ["Healthbar"] = { ["Enabled"] = false, ["Colors"] = { White, Black }}
+        ["Box"] = { ["Enabled"] = false, ["Colors"] = { White, Black }},
     };
 
     local Library = { Connections = { }, Settings = SettingsTemplate }; do
-        local Components = { Callbacks = { } }; do -- component's callback will not get called unless there is a key with the same name in the Settings table
-            function Components:Add(Name, Callback): nil
+        local Components = { Callbacks = { } }; do
+            function Components:Set(Name, Callback): nil
                 self.Callbacks[Name] = Callback;
             end
 
-            Components:Add("Box", function(Self, Options)
+            Components:Set("Box", function(Self, Options)
                 local Position, Size = Self:GetRender();
 
                 if (not Position) then
@@ -77,24 +88,200 @@ do
                 local Colors = Options.Colors;
                 local Color, OutlineColor = Colors[1], Colors[2];
 
-                local Outline = DrawingNew("Square", DrawingFlag);
-                Outline.Color = OutlineColor;
-                Outline.Visible = true;
-                Outline.Transparency = 1;
-                Outline.Thickness = 3;
-                Outline.Size = Size;
-                Outline.Position = Position;
+                Position = Vector2New(Round(Position.X), Round(Position.Y));
+                Size = Vector2New(Round(Size.X), Round(Size.Y));
 
-                local Square = DrawingNew("Square", DrawingFlag);
-                Square.Visible = true;
-                Square.Transparency = 1;
-                Square.Color = Color;
-                Square.Thickness = 1;
-                Square.Size = Size;
-                Square.Position = Position;
+                Utility:Drawing("Square", {
+                    ["Color"] = OutlineColor;
+                    ["Visible"] = true;
+                    ["Transparency"] = 1;
+                    ["Thickness"] = 3;
+                    ["Size"] = Size;
+                    ["Position"] = Position;
+                    ["ZIndex"] = 0;
+                });
+
+                Utility:Drawing("Square", {
+                    ["Color"] = Color;
+                    ["Visible"] = true;
+                    ["Transparency"] = 1;
+                    ["Thickness"] = 1;
+                    ["Size"] = Size;
+                    ["Position"] = Position;
+                    ["ZIndex"] = 1;
+                });
             end)
 
-            Components:Add("Name", function(Self, Options)
+            Components:Set("Corner", function(Self, Options) -- forgive me for this code
+                local Position, Size = Self:GetRender();
+
+                if (not Position) then
+                    return;
+                end
+            
+                local Colors = Options.Colors;
+                local Color, OutlineColor = Colors[1], Colors[2];
+
+                Position = Vector2New(Round(Position.X), Round(Position.Y));
+                Size = Vector2New(Round(Size.X), Round(Size.Y));
+            
+                local PositionX, PositionY = Position.X, Position.Y;
+                local SizeX, SizeY = Size.X, Size.Y;
+            
+                local Width = Round(SizeX * 0.2);
+                local Height = Round(SizeY * 0.2);
+
+                local PositionScale = PositionX + Width;
+                local HeightScale = PositionY + Height;
+
+                local From = Vector2New(PositionX, PositionY);
+                        
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(PositionX - 1, PositionY);
+                    ["To"] = Vector2New(PositionScale + 2, PositionY);
+                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = From;
+                    ["To"] = Vector2New(PositionScale + 1, PositionY);
+                    ["ZIndex"] = 1;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(PositionX, PositionY - 1);
+                    ["To"] = Vector2New(PositionX, HeightScale + 2);
+                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = From;
+                    ["To"] = Vector2New(PositionX, HeightScale + 1);
+                    ["ZIndex"] = 1;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(PositionX + SizeX + 1, PositionY);
+                    ["To"] = Vector2New(PositionX + SizeX - Width - 2, PositionY);
+                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = Vector2New(PositionX + SizeX, PositionY);
+                    ["To"] = Vector2New(PositionX + SizeX - Width - 1, PositionY);
+                    ["ZIndex"] = 1;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(PositionX + SizeX, PositionY - 1);
+                    ["To"] = Vector2New(PositionX + SizeX, HeightScale + 2);
+                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = Vector2New(PositionX + SizeX, PositionY);
+                    ["To"] = Vector2New(PositionX + SizeX, HeightScale + 1);
+                    ["ZIndex"] = 1;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(PositionX - 1, PositionY + SizeY - 1);
+                    ["To"] = Vector2New(PositionScale + 2, PositionY + SizeY - 1);
+                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = Vector2New(PositionX, PositionY + SizeY - 1);
+                    ["To"] = Vector2New(PositionScale + 1, PositionY + SizeY - 1);
+                    ["ZIndex"] = 1;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(PositionX, PositionY + SizeY + 1);
+                    ["To"] = Vector2New(PositionX, PositionY + SizeY - Height - 1);
+                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = Vector2New(PositionX, PositionY + SizeY);
+                    ["To"] = Vector2New(PositionX, PositionY + SizeY - Height);
+                    ["ZIndex"] = 1;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(PositionX + SizeX + 1, PositionY + SizeY - 1);
+                    ["To"] = Vector2New(PositionX + SizeX - Width - 2, PositionY + SizeY - 1);
+                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = Vector2New(PositionX + SizeX, PositionY + SizeY - 1);
+                    ["To"] = Vector2New(PositionX + SizeX - Width - 1, PositionY + SizeY - 1);
+                    ["ZIndex"] = 1;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = OutlineColor;
+                    ["Thickness"] = 3;
+                    ["From"] = Vector2New(PositionX + SizeX, PositionY + SizeY + 1);
+                    ["To"] = Vector2New(PositionX + SizeX, PositionY + SizeY - Height - 1);
+                    ["ZIndex"] = 0;
+                });
+            
+                Utility:Drawing("Line", {
+                    ["Visible"] = true;
+                    ["Color"] = Color;
+                    ["Thickness"] = 1;
+                    ["From"] = Vector2New(PositionX + SizeX, PositionY + SizeY);
+                    ["To"] = Vector2New(PositionX + SizeX, PositionY + SizeY - Height);
+                    ["ZIndex"] = 1;
+                });
+            end);
+
+            Components:Set("Name", function(Self, Options)
                 local Position, Size = Self:GetRender();
 
                 if (not Position) then
@@ -104,20 +291,27 @@ do
                 local Colors = Options.Colors;
                 local Color, OutlineColor = Colors[1], Colors[2];
 
-                local Text = DrawingNew("Text", DrawingFlag);
-                Text.Color = Color;
-                Text.Visible = true;
-                Text.Transparency = 1;
-                Text.Font = 2;
-                Text.Size = 13;
-                Text.Outline = true;
-                Text.OutlineColor = OutlineColor;
-                Text.Center = true;
-                Text.Text = Self:GetName();
-                Text.Position = Vector2New(Position.X + (Size.X / 2), Position.Y - 15);
+                local Name = Self:GetName();
+
+                Position = Vector2New(Round(Position.X), Round(Position.Y));
+                Size = Vector2New(Round(Size.X), Round(Size.Y));
+
+                Utility:Drawing("Text", {
+                    ["Color"] = Color;
+                    ["Visible"] = true;
+                    ["Transparency"] = 1;
+                    ["Font"] = 2;
+                    ["Size"] = 13;
+                    ["Outline"] = true;
+                    ["OutlineColor"] = OutlineColor;
+                    ["Center"] = true;
+                    ["Text"] = Name;
+                    ["Position"] = Vector2New(Position.X + (Size.X * 0.5), Position.Y - 15);
+                    ["ZIndex"] = 2;
+                });
             end)
 
-            Components:Add("Healthbar", function(Self, Options)
+            Components:Set("Healthbar", function(Self, Options)
                 local Position, Size, Character = Self:GetRender();
 
                 if (not Position) then
@@ -127,35 +321,39 @@ do
                 local Colors = Options.Colors;
                 local Color, OutlineColor = Colors[1], Colors[2];
 
+                Position = Vector2New(Round(Position.X), Round(Position.Y));
+                Size = Vector2New(Round(Size.X), Round(Size.Y));
+
                 local PositionX, PositionY = Position.X - 4, Position.Y;
 
-                local Outline, Bar = DrawingNew("Line", DrawingFlag), DrawingNew("Line", DrawingFlag);
-                Outline.Transparency, Outline.Visible, Bar.Transparency, Bar.Visible = 1, true, 1, true;
-
-                local Top = Floor(PositionY + 0.5);
-                local Bottom = Floor(PositionY + Size.Y + 0.5);
-
+                local Top, Bottom = Floor(PositionY + 0.5), Floor(PositionY + Size.Y + 0.5);
                 local Health, MaxHealth = Self:GetHealth(Character);
+                local HealthRatio = Max(0, Min(1, Health / MaxHealth));
+                local HealthHeight = Bottom - Floor(HealthRatio * (Bottom - Top) + 0.5);
 
-                Bar.Color = Color;
-                Bar.Thickness = 1;
-                Bar.From = Vector2New(PositionX, Bottom);
-                Bar.To = Vector2New(PositionX, Bottom - Floor(Max(0, Min(1, Health / MaxHealth)) * (Bottom - Top) + 0.5));
+                Utility:Drawing("Line", {
+                    ["Visible"] = true,
+                    ["Color"] = OutlineColor,
+                    ["Thickness"] = 3,
+                    ["From"] = Vector2New(PositionX, Bottom + 1),
+                    ["To"] = Vector2New(PositionX, Top - 1),
+                    ["ZIndex"] = 0,
+                });
 
-                Outline.Color = OutlineColor;
-                Outline.Thickness = 3;
-                Outline.From = Vector2New(PositionX, Bottom + 1);
-                Outline.To = Vector2New(PositionX, Top - 1);
+                Utility:Drawing("Line", {
+                    ["Visible"] = true,
+                    ["Color"] = Color,
+                    ["Thickness"] = 1,
+                    ["From"] = Vector2New(PositionX, Bottom),
+                    ["To"] = Vector2New(PositionX, HealthHeight),
+                    ["ZIndex"] = 1,
+                });
             end)
         end
 
         local PlayerManager = { }; do
             local PlayerObject = { Position = Vector2Zero, Size = Vector2Zero, Tick = -1 }; do
-                function PlayerObject:GetName(): string
-                    return tostring(self.Player);
-                end
-
-                function PlayerObject:GetRender(): ( Vector2, Vector2, table ) --[[  Position, Size, Character  ]]
+                function PlayerObject:GetRender(): ( Vector2, Vector2, table )
                     local Character, PrimaryPart = self:GetCharacter();
 
                     if (not PrimaryPart) then
@@ -170,14 +368,22 @@ do
                     end
 
                     local Distance = ScreenPosition.Z;
-                    local Scale = (2 * Camera.ViewportSize.Y) / ((2 * Distance * Tan(Rad(Camera.FieldOfView) / 2)) * 1.5);
+                    local Scale = (2 * Camera.ViewportSize.Y) / ((2 * Distance * Tan(Rad(Camera.FieldOfView) * 0.5)) * 1.5);
 
                     local Width, Height = Round(3 * Scale), Round(4 * Scale);
 
                     local Size = Vector2New(Width, Height);
-                    local Center = Vector2New(Round(ScreenPosition.X - (Width / 2)), Round(ScreenPosition.Y - (Height / 2)));
+                    local Center = Vector2New(Round(ScreenPosition.X - (Width * 0.5)), Round(ScreenPosition.Y - (Height * 0.5)));
 
                     return Center, Size, Character;
+                end
+
+                function PlayerObject:GetPlayer()
+                    return self.Player;
+                end
+
+                function PlayerObject:GetName(): string
+                    return tostring(self:GetPlayer());
                 end
 
                 function PlayerObject:GetHealth(Character): number
@@ -191,7 +397,7 @@ do
                 end
                 
                 function PlayerObject:GetCharacter(): ( table, Instance )
-                    local Player = self.Player;
+                    local Player = self:GetPlayer();
                     local Character = Player.Character;
 
                     if (not Character) then
@@ -216,7 +422,7 @@ do
                     Object.Player = Player;
 
                     return Object;
-                end })
+                end });
             end
 
             function PlayerManager:Get(): table
@@ -250,8 +456,8 @@ do
             end)
         end
         
-        function Library:SetPlayerObject(Index, Value): nil
-            PlayerManager.PlayerObject = Value;
+        function Library:GetPlayerObject(): table
+            return PlayerManager.PlayerObject;
         end
 
         Library.Players = PlayerManager;
